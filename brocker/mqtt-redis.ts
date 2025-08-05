@@ -1,5 +1,5 @@
 import mqtt, { MqttClient } from "mqtt";
-import Redis, { Pipeline, Redis as RedisClient } from "ioredis";
+import Redis, { Redis as RedisClient } from "ioredis";
 import genericPool, { Pool } from "generic-pool";
 
 // ==== Environment Config ====
@@ -54,13 +54,15 @@ const redisPool: Pool<RedisClient> = genericPool.createPool(redisFactory, {
 // ==== MQTT Setup ====
 const brokerOptions = {
     host: MQTT_HOST,
-    port: parseInt(MQTT_PORT || "1883", 10),
-    protocol: "mqtt" as const,
+    port: parseInt(MQTT_PORT || "8883", 10),
+    protocol: "mqtts" as const,
     clientId: `redisworker-${Math.random().toString(36).substring(2, 10)}`,
     username: MQTT_USERNAME,
     password: MQTT_PASSWORD,
 };
 
+console.log("Connecting to MQTT broker:", `${MQTT_HOST}:${MQTT_PORT}, with client ID: ${brokerOptions.clientId}`);
+console.log("Using Redis host:", REDIS_HOST, "and port:", REDIS_PORT);
 const mqttClient: MqttClient = mqtt.connect(brokerOptions);
 
 mqttClient.on("connect", () => {
@@ -112,7 +114,7 @@ async function processChunk(chunk: Map<string, any[]>): Promise<void> {
     const client = await redisPool.acquire();
 
     try {
-        const pipeline: Pipeline = client.pipeline();
+        const pipeline = client.pipeline();
 
         for (const [key, messages] of chunk.entries()) {
             const values = messages.map((msg) => JSON.stringify(msg));
@@ -132,6 +134,7 @@ async function processChunk(chunk: Map<string, any[]>): Promise<void> {
 mqttClient.on("message", (_, message: Buffer) => {
     try {
         const payload = JSON.parse(message.toString());
+        console.log("Received message:", payload);
         const { id, rID } = payload;
         if (!id || !rID) return;
 
