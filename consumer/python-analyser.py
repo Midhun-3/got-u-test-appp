@@ -7,7 +7,7 @@ from datetime import timezone
 from statistics import mean
 
 # Configuration
-    REDIS_URL = "redis://:password@resort-1-redis-master.resort-1-redis.svc.cluster.local:6379"
+REDIS_URL = "redis://:password@resort-1-redis-master.resort-1-redis.svc.cluster.local:6379"
 NUM_DEVICES = 10000
 MAX_PARALLEL_FETCHES = 1000  # Concurrency limit
 DEVICE_IDS = [f"device-{str(i+1).zfill(3)}" for i in range(NUM_DEVICES)]
