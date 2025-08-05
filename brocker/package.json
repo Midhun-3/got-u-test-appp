@@ -1,11 +1,11 @@
 {
   "name": "worker",
   "version": "1.0.0",
-  "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "env $(cat .env | xargs) ts-node mqtt-redis.ts"
+    "build": "tsc",
+    "start-dev": "env $(cat .env | xargs) ts-node mqtt-redis.ts",
+    "start": "env $(cat .env | xargs) node dist/mqtt-redis.js"
   },
   "keywords": [],
   "author": "",
@@ -15,5 +15,9 @@
     "generic-pool": "^3.9.0",
     "ioredis": "^5.7.0",
     "mqtt": "^5.14.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
   }
 }
